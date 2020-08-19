@@ -109,7 +109,11 @@ class CPU:
         HLT = 0b00000001
         LDI = 0b10000010
         PRN = 0b01000111
-        MUL = 0b10100010      
+        MUL = 0b10100010
+        PUSH = 0b01000101
+        POP = 0b01000110
+        SP = 6
+
         running = True
 
         while running:
@@ -142,7 +146,23 @@ class CPU:
                 self.reg[operand_a] = product
                 self.pc += 3
             
-            # Unknown instructions
+            # PUSH
+            elif ir == PUSH:
+                # decrement the stack pointer
+                self.reg[SP] -= 1
+                # store value from reg to ram
+                self.ram_write(self.reg[operand_a], self.reg[SP])
+                self.pc += 2
+
+            # POP
+            elif ir == POP:
+                # read value of SP and overwrite next register
+                value = self.ram_read(self.reg[SP])
+                self.reg[operand_a] = value
+                # increment SP
+                self.reg[SP] += 1
+                self.pc += 2
+
             else:
                 print(f"Unknown instruction {ir} at address {self.pc}")
                 self.pc += 1
