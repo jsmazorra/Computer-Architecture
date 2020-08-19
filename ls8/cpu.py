@@ -2,6 +2,7 @@
 
 import sys
 
+
 class CPU:
     """Main CPU class."""
 
@@ -30,7 +31,7 @@ class CPU:
         if filename:
             with open(
                 filename
-            ) as f:  # could be changed to "with open('./examples/' + filename) as f:" to address filename directly, but I prefer to specify file path.
+            ) as f:
                 address = 0
                 for line in f:
                     value = line.split("#")[0].strip()
@@ -102,11 +103,13 @@ class CPU:
         print()
 
     def run(self):
-        """"Run the CPU."""
+        """Run the CPU."""
+
+        # Instructions
         HLT = 0b00000001
         LDI = 0b10000010
         PRN = 0b01000111
-
+        MUL = 0b10100010      
         running = True
 
         while running:
@@ -133,6 +136,12 @@ class CPU:
                 print(self.reg[operand_a])
                 self.pc += 2
 
+            # MUL
+            elif ir == MUL:
+                product = self.reg[operand_a] * self.reg[operand_b]
+                self.reg[operand_a] = product
+                self.pc += 3
+            
             # Unknown instructions
             else:
                 print(f"Unknown instruction {ir} at address {self.pc}")
