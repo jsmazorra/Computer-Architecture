@@ -112,6 +112,14 @@ class CPU:
         MUL = 0b10100010
         PUSH = 0b01000101
         POP = 0b01000110
+        ADD = 0b10100000
+        CALL = 0b01010000
+        RET = 0b00010001
+        NOP = 0b00000000
+        CMP = 0b10100111
+        JMP = 0b01010100
+        JEQ = 0b01010101
+        
         SP = 6
 
         running = True
@@ -163,20 +171,47 @@ class CPU:
                 self.reg[SP] += 1
                 self.pc += 2
 
+            # ADD
+            elif ir == ADD:
+                add = self.reg[operand_a] + self.reg[operand_b]
+                self.reg[operand_a] = add
+                self.pc += 3
+           
+            # CALL
+            elif ir == CALL:
+                self.reg[SP] -= 1
+                self.ram_write(self.pc + 2, self.reg[SP])
+                self.pc = self.reg[operand_a]
+            
+            # NOP
+            elif ir == NOP:
+            # Do nothing and move on to next instruction    
+                self.pc += 1
+                continue
+
+            # RET
+            elif ir == RET:
+                self.pc = self.ram[self.reg[SP]]
+                self.reg[SP] += 1
+
+            # CMP
+            elif ir == CMP:
+                self.alu("CMP", operand_a, operand_b)
+                self.pc += 3
+
+            # JMP
+            elif ir == JMP:
+                self.pc == self.reg[operand_a]
+                break
+
+            # JEQ
+            elif ir == JEQ:
+                if (self.flag & HLT) == 1:
+                    self.pc = self.reg[operand_a]
+
+                else:
+                    self.pc += 2
+
             else:
                 print(f"Unknown instruction {ir} at address {self.pc}")
                 self.pc += 1
-
-
-# Test
-if __name__ == "__main__":
-    LS8 = CPU()
-    LS8.load()
-    for i in range(9):
-        print(LS8.ram_read(i))
-
-    LS8.ram_write(0, 15)
-
-    print("==============")
-    print(LS8.ram_read(0))
-    print("==============")
