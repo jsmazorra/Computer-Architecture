@@ -68,6 +68,16 @@ class CPU:
 
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+        
+        elif op == "CMP":
+            if self.reg[reg_a] == self.reg[reg_b]:
+                self.flag = 0b00000001
+
+            elif self.reg[reg_a] > self.reg[reg_b]:
+                self.flag = 0b10000010
+
+            else:
+                self.flag = 0b00000100
 
         else:
             raise Exception("Unsupported ALU operation")
@@ -119,8 +129,9 @@ class CPU:
         CMP = 0b10100111
         JMP = 0b01010100
         JEQ = 0b01010101
+        JNE = 0b01010110
         
-        SP = 6
+        SP = 7
 
         running = True
 
@@ -207,6 +218,14 @@ class CPU:
             # JEQ
             elif ir == JEQ:
                 if (self.flag & HLT) == 1:
+                    self.pc = self.reg[operand_a]
+
+                else:
+                    self.pc += 2
+            
+            # JNE
+            elif ir == JNE:
+                if (self.flag & HLT) == 0:
                     self.pc = self.reg[operand_a]
 
                 else:
